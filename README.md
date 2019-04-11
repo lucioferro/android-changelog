@@ -2,22 +2,23 @@
 
 Table of contents
 
-* [Introduction blabla](#introduction-blabla)
-  + [What ?](#what)
-  + [Why ?](#why)
-  + [Overview](#overview)
-  + [Features](#features)
-  + [Samples](#samples)
-* [Getting started](#getting-started)
-  + [Include the library](#include-the-library)
-  + [Configure the dialog style](#configure-the-dialog-style)
-  + [Write the changelog](#write-the-changelog)
-  + [Display the dialog](#display-the-dialog)
-* [Customisation](#customisation)
-  + [Change the dialog title](#change-the-dialog-title)
-  + [Choose what release to show](#choose-what-release-to-show)
-  + [Define your own styles](#define-your-own-styles)
-* [Acknowledgments](#acknowledgments)
+- [Changelog Library for Android](#changelog-library-for-android)
+  - [Introduction blabla](#introduction-blabla)
+    - [What](#what)
+    - [Why](#why)
+    - [Overview](#overview)
+    - [Features](#features)
+    - [Samples](#samples)
+  - [Getting started](#getting-started)
+    - [Include the library](#include-the-library)
+    - [Configure the dialog style](#configure-the-dialog-style)
+    - [Write the changelog](#write-the-changelog)
+    - [Display the dialog](#display-the-dialog)
+  - [Customisation](#customisation)
+    - [Change the dialog title](#change-the-dialog-title)
+    - [Choose what release to show](#choose-what-release-to-show)
+    - [Define your own styles](#define-your-own-styles)
+  - [Acknowledgments](#acknowledgments)
 
 ## Introduction blabla 
 
@@ -99,16 +100,16 @@ Create an xml file in `res/xml`, for example `changelog.xml`. The format is rath
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
    <release version="1.2" versioncode="3" summary="I don't remember what this release is about... But I can assure you the update is worth it." date="2018-05-30">
-        <change>Fix bugs introduced in version 1.1</change>
+        <change type="bug">Fix bugs introduced in version 1.1</change>
         <change>...</change>
     </release>
     <release version="1.1" versioncode="2" date="2018-05-30">
-        <change>Fix the leaking of private information to NSA</change>
+        <change type="remove">Fix the leaking of private information to NSA</change>
         <change>Change colors</change>
-        <change>Introduce new bugs</change>
+        <change type="notice">Introduce new bugs</change>
     </release>
     <release version="1.0" versioncode="1" summary="Made it !" date="2018-02-18">
-        <change>First commit</change>
+        <change type="add">First commit</change>
     </release>
 </changelog>
 ```
@@ -118,6 +119,7 @@ Note that:
 * the date is in ISO format: `YYYY-MM-dd`
 * the `versionName` and `versionCode` are mandatory and should match the versions stated in `build.gradle`
 * `date` and `summary` are optional
+* `type` is also optional and will replace icon with a customizable icon in the `style.xml`. You can choose between `[default|add|bug|remove|notice]. Any unrecognised or left out type will lead to the basic bullet as the icon.
 
 ### Display the dialog
 
@@ -183,6 +185,8 @@ An example is worth a thousand words. To make the screenshot on the right in the
     <!-- just override the title and bullet styles -->
     <item name="changelogTitleStyle">@style/MyChangelogHeader</item>
     <item name="changelogBulletStyle">@style/MyChangelogBullet</item>
+    <!-- change the icon drawable here -->
+    <item name="changelogBulletIcon[Add|Bug|Default|Notice|Remove]">@drawable/myIcon</item>
 </style>
 
 <style name="MyChangelogHeader" parent="LibChangelog.HeaderTitle">
@@ -205,6 +209,9 @@ An example is worth a thousand words. To make the screenshot on the right in the
 Done !
 
 ## Acknowledgments
+
+This library is a port of Lucy Linder's android-changelog to AndroidX with Material Design Components.  
+I also added customizable icons.
 
 This library has been motivated by the following project (from whom I reused the xml structure):
 

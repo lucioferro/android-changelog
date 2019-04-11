@@ -2,15 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 2
+        versionName "2.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
 
@@ -24,52 +24,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation "com.google.android.material:material:1.1.0-alpha05"
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 repositories {
     mavenCentral()
 }
-
-// -------------- Bintray upload configuration
-// The `bintray.username` and `bintray.apikey` must be set in `local.properties`
-// To upload a new version, use:
-//      ./gradlew install
-//      ./gradlew bintrayUpload
-
-// Dokka is a fix for kotlin libraries on bintray. See:
-// https://medium.com/bcgdv-engineering/how-to-publish-a-kotlin-android-library-to-jcenter-1f1875633ece
-apply plugin: 'org.jetbrains.dokka-android'
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
-}
-
-// Configuration for the grade-bintray-plugin
-ext {
-    bintrayRepo = 'maven' // your repo name
-    bintrayName = 'android-changelog' // has to be same as your library module name
-    publishedGroupId = 'ch.derlin.changelog' // your module package name
-    libraryName = "${bintrayName}"
-    artifact = "${bintrayName}" // has to be same as your library module name
-    libraryDescription = 'Changelog Dialog library for Android (Kotlin)'
-    siteUrl = 'https://github.com/derlin/android-changelog'
-    gitUrl = "${siteUrl}.git"
-    libraryVersion = "${android.defaultConfig.versionName}"
-    developerId = 'derlin'
-    developerName = 'Lucy Linder'
-    developerEmail = 'lucy.derlin@gmail.com'
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
-
-// once again, see https://medium.com/bcgdv-engineering/how-to-publish-a-kotlin-android-library-to-jcenter-1f1875633ece
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'bintrayv1.gradle'

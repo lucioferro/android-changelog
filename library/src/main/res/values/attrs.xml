@@ -8,6 +8,16 @@
         <attr name="changelogHeaderDateStyle" format="reference" />
         <attr name="changelogHeaderSummaryStyle" format="reference" />
         <attr name="changelogBulletStyle" format="reference" />
+
+        <!-- Start Updated to AndroidX: Copyright (C) 2019 Arne Rantzen (Tyxz)-->
+
+        <attr name="changelogBulletIconDefault" format="reference" />
+        <attr name="changelogBulletIconAdd" format="reference" />
+        <attr name="changelogBulletIconBug" format="reference" />
+        <attr name="changelogBulletIconNotice" format="reference" />
+        <attr name="changelogBulletIconRemove" format="reference" />
+
+        <!-- END -->
         <attr name="changelogTextStyle" format="reference" />
     </declare-styleable>
 </resources>

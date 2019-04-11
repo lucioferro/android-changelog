@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Update Copyright (C) 2019 Arne Rantzen (Tyxz)-->
 <changelog>
     <release version="1.2" versioncode="3" summary="Example summary" date="2012-12-26">
-        <change>Fixed: A bug fix</change>
-        <change>Button appearance changed</change>
-        <change>More small layout changes</change>
+        <change type="bug">Fixed: A bug fix</change>
+        <change type="default">Button appearance changed</change>
+        <change type="default">More small layout changes</change>
     </release>
     <release version="1.1" versioncode="2" date="2012-09-12">
-        <change>Small layout change</change>
-        <change>Minor tweaks</change>
+        <change type="add">Small layout change</change>
+        <change type="remove">Minor tweaks</change>
     </release>
     <release version="1.0" versioncode="1" date="2012-09-10">
-        <change>Welcome !</change>
-        <change>First release</change>
-        <change>Everything functional</change>
+        <change type="notice">Welcome !</change>
+        <change type="default">First release</change>
+        <change type="default">Everything functional</change>
     </release>
 </changelog>

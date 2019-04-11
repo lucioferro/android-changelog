@@ -5,8 +5,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.text.format.DateFormat
+import android.util.Log
+import android.util.Xml
 import android.view.View
 import android.widget.TextView
 import org.xmlpull.v1.XmlPullParser
@@ -24,6 +26,10 @@ import java.text.ParseException
  * This software may be modified and distributed under the terms
  * of the Apache 2.0 license.  See the LICENSE file for details.
  */
+/**
+ *  Updated to AndroidX: Copyright (C) 2019 Arne Rantzen (Tyxz)
+ */
+
 object Changelog {
 
     /** Use this value if you want all the changelog (i.e. all the release entries) to appear. */
@@ -37,6 +43,7 @@ object Changelog {
         val VERSION_CODE = "versioncode"
         val SUMMARY = "summary"
         val DATE = "date"
+        val TYPE ="type"
     }
 
     /**
@@ -52,7 +59,7 @@ object Changelog {
                      title: String? = null, resId: Int = R.xml.changelog): AlertDialog {
         return AlertDialog.Builder(ctx)
                 .setView(createChangelogView(ctx, versionCode, title, resId))
-                .setPositiveButton("OK", { _, _ -> })
+                .setPositiveButton("OK") { _, _ -> }
                 .create()
     }
 
@@ -131,9 +138,15 @@ object Changelog {
         )
         xml.next()
         // parse changes
-        while (xml.name == XmlTags.ITEM || xml.eventType == XmlPullParser.TEXT) {
-            if (xml.eventType == XmlPullParser.TEXT) {
-                items.add(ChangelogItem(xml.text))
+        var type = "default"
+        var name = xml.name
+        while (xml.name == XmlTags.ITEM || xml.eventType== XmlPullParser.TEXT) {
+            if(xml.eventType == XmlPullParser.START_TAG)
+                type = xml.getAttributeValue(null, XmlTags.TYPE) ?: "default"
+            else if(xml.eventType == XmlPullParser.END_TAG)
+                name = null
+            else if (xml.eventType == XmlPullParser.TEXT) {
+                items.add(ChangelogItem(xml.text, type))
             }
             xml.next()
         }

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ChangelogDialog.iml" filepath="$PROJECT_DIR$/ChangelogDialog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/android-changelog.iml" filepath="$PROJECT_DIR$/.idea/android-changelog.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/samples.iml" filepath="$PROJECT_DIR$/samples/samples.iml" />
     </modules>
