@@ -7,10 +7,9 @@ import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
 import androidx.recyclerview.widget.RecyclerView
 import android.text.format.DateFormat
-import android.util.Log
-import android.util.Xml
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.pm.PackageInfoCompat.getLongVersionCode
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
@@ -83,9 +82,9 @@ object Changelog {
      * @return a pair <versionName, versionCode> (as set in the build.gradle file). Example: <"1.1", 3>
      */
     @Throws(PackageManager.NameNotFoundException::class)
-    fun Activity.getAppVersion(): Pair<Int, String> {
+    fun Activity.getAppVersion(): Pair<Long, String> {
         val packageInfo = packageManager.getPackageInfo(packageName, 0)
-        return Pair(packageInfo.versionCode, packageInfo.versionName)
+        return Pair(getLongVersionCode(packageInfo), packageInfo.versionName)
     }
 
     // -----------------------------------------
