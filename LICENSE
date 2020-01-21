@@ -16,4 +16,7 @@ limitations under the License.
 Update to AndroidX + Material + New Icons
 (c) 2019 Arne Rantzen (https://github.com/Tyxz)
 
+Android min and target sdk changed. Updated versions of libraries and Kotlin.
+(c) 2020 Lucio Ferro (https://github.com/lucioferro)
+
 Licensed under the Apache License, Version 2.0
