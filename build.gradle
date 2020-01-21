@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.gradle.spotless" version '3.20.0'
+    id "com.diffplug.gradle.spotless" version '3.27.1'
 }
 
 allprojects {
@@ -27,6 +27,6 @@ allprojects {
 spotless {
     kotlin {
         target "**/*.kt"
-        ktlint('0.30.0')
+        ktlint('0.35.0')
     }
 }
