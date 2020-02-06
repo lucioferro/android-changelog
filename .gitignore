@@ -128,3 +128,4 @@ lint/tmp/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+*.pb

@@ -3,18 +3,25 @@ package ch.derlin.changelog
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
-import androidx.recyclerview.widget.RecyclerView
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.pm.PackageInfoCompat.getLongVersionCode
+import androidx.recyclerview.widget.RecyclerView
+import ch.derlin.changelog.Changelog.getAppVersion
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
+import java.lang.Integer.parseInt
 import java.sql.Date
 import java.text.ParseException
+import java.util.prefs.PreferenceChangeEvent
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 /**
@@ -32,7 +39,7 @@ import java.text.ParseException
 object Changelog {
 
     /** Use this value if you want all the changelog (i.e. all the release entries) to appear. */
-    val ALL_VERSIONS = 0
+    val ALL_VERSIONS = 0L
 
     /** Constants for xml tags and attributes (see res/xml/changelog.xml for an example) */
     object XmlTags {
@@ -46,6 +53,23 @@ object Changelog {
     }
 
     /**
+     * Create a dialog displaying the changelog from last update.
+     * @param ctx The calling activity
+     */
+    fun showDialogOnlyOnce(ctx: Activity, showOnFirstExecution: Boolean = false){
+        //Show changelog dialog
+        val version = ctx.getAppVersion()
+
+        val pref = ChangeLogPreference(ctx)
+        val lastVersion = pref.getVersion()
+        if ((showOnFirstExecution && lastVersion == 0L) || (lastVersion > 0 && lastVersion < version.first)) {
+            val dialog = createDialog(ctx, versionCode = lastVersion)
+            dialog.setOnDismissListener({ _ -> pref.writeVersion(version.first) })
+            dialog.show()
+        }
+    }
+
+    /**
      * Create a dialog displaying the changelog.
      * @param ctx The calling activity
      * @param versionCode Define the oldest version to show. In other words, the dialog will contains
@@ -54,9 +78,9 @@ object Changelog {
      * @param resId The resourceId of the xml file, default to `R.xml.changelog`
      */
     @Throws(XmlPullParserException::class, IOException::class)
-    fun createDialog(ctx: Activity, versionCode: Int = ALL_VERSIONS,
+    fun createDialog(ctx: Activity, versionCode: Long = ALL_VERSIONS,
                      title: String? = null, resId: Int = R.xml.changelog): AlertDialog {
-        return AlertDialog.Builder(ctx)
+        return AlertDialog.Builder(ctx, R.style.ChangeLogAlertDialogTheme)
                 .setView(createChangelogView(ctx, versionCode, title, resId))
                 .setPositiveButton("OK") { _, _ -> }
                 .create()
@@ -68,7 +92,7 @@ object Changelog {
      * See [createDialog] for the parameters.
      */
     @Throws(XmlPullParserException::class, IOException::class)
-    fun createChangelogView(ctx: Activity, versionCode: Int = ALL_VERSIONS,
+    fun createChangelogView(ctx: Activity, versionCode: Long = ALL_VERSIONS,
                             title: String? = null, resId: Int = R.xml.changelog): View {
         val view = ctx.layoutInflater.inflate(R.layout.changelog, null)
         val changelog = loadChangelog(ctx, resId, versionCode)
@@ -97,14 +121,14 @@ object Changelog {
      * @return the list of [ChangelogItem], in the order of the [resourceId] file (most to less recent)
      */
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun loadChangelog(context: Activity, resourceId: Int = R.xml.changelog, version: Int = ALL_VERSIONS):
+    private fun loadChangelog(context: Activity, resourceId: Int = R.xml.changelog, version: Long = ALL_VERSIONS):
             MutableList<ChangelogItem> {
         val clList = mutableListOf<ChangelogItem>()
         val xml = context.resources.getXml(resourceId)
         try {
             while (xml.eventType != XmlPullParser.END_DOCUMENT) {
                 if (xml.eventType == XmlPullParser.START_TAG && xml.name == XmlTags.RELEASE) {
-                    val releaseVersion = Integer.parseInt(xml.getAttributeValue(null, XmlTags.VERSION_CODE))
+                    val releaseVersion = xml.getAttributeValue(null, XmlTags.VERSION_CODE).toLong()
                     clList.addAll(parseReleaseTag(context, xml))
                     if (releaseVersion <= version) break
                 } else {
@@ -133,19 +157,19 @@ object Changelog {
                 date = xml.getAttributeValue(null, XmlTags.DATE)?.let {
                     parseDate(context, it)
                 },
-                summary = xml.getAttributeValue(null, XmlTags.SUMMARY))
+                summary = parseResource(context,xml.getAttributeValue(null, XmlTags.SUMMARY)))
         )
         xml.next()
         // parse changes
         var type = "default"
-        var name = xml.name
+        var name: String? = xml.name
         while (xml.name == XmlTags.ITEM || xml.eventType== XmlPullParser.TEXT) {
             if(xml.eventType == XmlPullParser.START_TAG)
                 type = xml.getAttributeValue(null, XmlTags.TYPE) ?: "default"
             else if(xml.eventType == XmlPullParser.END_TAG)
                 name = null
             else if (xml.eventType == XmlPullParser.TEXT) {
-                items.add(ChangelogItem(xml.text, type))
+                items.add(ChangelogItem(parseResource(context,xml.text)!!, type))
             }
             xml.next()
         }
@@ -167,4 +191,115 @@ object Changelog {
             return dateString
         }
     }
+
+    /**
+     * Recursively replaces resources such as `@string/abc` with
+     * their localized values from the app's resource strings (e.g.
+     * `strings.xml`) within a `source` string.
+     *
+     * Also works recursively, that is, when a resource contains another
+     * resource that contains another resource, etc.
+     *
+     * @param source
+     * @return `source` with replaced resources (if they exist)
+     */
+    private fun parseResource(ctx: Context, source: String?) : String? {
+        if (source?.startsWith("@") != true)
+            return source
+
+        if (!source.startsWith("@string")) {
+            try {
+                val resourceId = parseInt(source.substring(1))
+                return ctx.getString(resourceId)
+            } catch (e: NumberFormatException) {
+                Log.w(ctx.packageName,
+                        "No String resource found for ID \"${source}\" while inserting resources")
+            }
+            return null
+        }
+
+         val REGEX_RESOURCE_STRING = "@string/([A-Za-z0-9-_]*)"
+
+        val p: Pattern = Pattern.compile(REGEX_RESOURCE_STRING)
+        val m: Matcher = p.matcher(source)
+        val sb = StringBuffer()
+        while (m.find()) {
+            val srcName = m.group(1) ?: continue
+                var stringFromResources = getStringByName(ctx, srcName)
+                if (stringFromResources == null) {
+                    Log.w( ctx.packageName,
+                            "No String resource found for ID \"${srcName.toString()}\" while inserting resources")
+                    /*
+                 * No need to try to load from defaults, android is trying that
+                 * for us. If we're here, the resource does not exist. Just
+                 * return its ID.
+                 */
+                    stringFromResources = srcName
+                }
+                m.appendReplacement(sb,  // Recurse
+                        parseResource(ctx, stringFromResources))
+        }
+        m.appendTail(sb)
+        return sb.toString()
+    }
+
+    /**
+     * Returns the string value of a string resource (e.g. defined in
+     * <code>values.xml</code>).
+     *
+     * @param name
+     * @return the value of the string resource or <code>null</code> if no
+     *         resource found for id
+     */
+    private fun getStringByName(ctx: Context, name: String?): String? {
+        val resourceId = getResourceId(ctx, "string", name)
+        return if (resourceId != 0) {
+            ctx.getString(resourceId)
+        } else {
+            null
+        }
+    }
+
+    /**
+     * Finds the numeric id of a string resource (e.g. defined in
+     * <code>values.xml</code>).
+     *
+     * @param defType
+     *            Optional default resource type to find, if "type/" is not
+     *            included in the name. Can be null to require an explicit type.
+     *
+     * @param name
+     *            the name of the desired resource
+     * @return the associated resource identifier. Returns 0 if no such resource
+     *         was found. (0 is not a valid resource ID.)
+     */
+    private fun getResourceId(context: Context, defType: String,
+                              name: String?): Int {
+        return context.resources.getIdentifier(name, defType,
+                context.packageName)
+    }
+
+    /**
+     * Control change log preference
+     */
+    class ChangeLogPreference(val ctx: Context) {
+        private val PREF_ID = "chanegLogPref"
+        private val ACTUAL_VERSION_PREF = "lastVersion"
+
+        private fun prefs(): SharedPreferences {
+            return ctx.getSharedPreferences(PREF_ID, 0)
+        }
+
+        fun writeVersion(value: Long){
+            prefs().edit().run {
+                putLong(ACTUAL_VERSION_PREF, value)
+            }.apply()
+        }
+
+        fun getVersion() = prefs().getLong(ACTUAL_VERSION_PREF, 0)
+    }
+
+
 }
+
+

@@ -54,4 +54,24 @@
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
     </style>
 
+    <!-- DIALOG Theme -->
+
+    <style name="ChangeLogAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+<!--        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>-->
+        <item name="buttonBarPositiveButtonStyle">@style/ChangeLogPositiveButtonStyle</item>
+
+    </style>
+
+<!--    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">-->
+<!--        <item name="android:textColor">#f00</item>-->
+<!--    </style>-->
+
+    <style name="ChangeLogPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/design_default_color_on_primary</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+<!--        <item name="rippleColor">@color/colorAccent</item>-->
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
 </resources>

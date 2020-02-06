@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         btnLatestChangelog.setOnClickListener { _ -> showChangelog(3) }
     }
 
-    private fun showChangelog(version: Int = Changelog.ALL_VERSIONS) {
+    private fun showChangelog(version: Long = Changelog.ALL_VERSIONS) {
         Changelog.createDialog(this, versionCode = version).show()
     }
 }
