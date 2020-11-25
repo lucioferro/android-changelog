@@ -63,12 +63,19 @@ class ChangelogAdapter(val list: List<ChangelogItem>) :
             if (list[position] is ChangelogHeader) 1 else 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        return if (viewType > 0) {
-            HeaderHolder(LayoutInflater.from(parent.context)
-                    .inflate(R.layout.changelog_cell_header, parent, false))
-        } else {
-            Holder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.changelog_cell, parent, false))
+        var name = ""
+        try {
+            return if (viewType > 0) {
+                name = parent.context.resources.getResourceEntryName(R.layout.changelog_cell_header)
+                HeaderHolder(LayoutInflater.from(parent.context)
+                        .inflate(R.layout.changelog_cell_header, parent, false))
+            } else {
+                name = parent.context.resources.getResourceEntryName(R.layout.changelog_cell)
+                Holder(LayoutInflater.from(parent.context)
+                        .inflate(R.layout.changelog_cell, parent, false))
+            }
+        } catch (tr: Throwable) {
+            throw Exception("Error creating viewHolder. viewType[$viewType] view[${name}]",tr)
         }
     }
 

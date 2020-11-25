@@ -3,7 +3,7 @@
 
     <!-- Base library theme. -->
     <style name="LibChangelog" parent="Theme.MaterialComponents.DayNight">
-        <item name="changelogWindowStyle">@style/LibChangelog.Window</item>
+<!--        <item name="changelogWindowStyle">@style/LibChangelog.Window</item>-->
         <item name="changelogTitleStyle">@style/LibChangelog.DialogTitle</item>
         <item name="changelogHeaderTitleStyle">@style/LibChangelog.HeaderTitle</item>
         <item name="changelogHeaderDateStyle">@style/LibChangelog.HeaderDate</item>
@@ -52,6 +52,26 @@
 
     <style name="LibChangelog.CellText" parent="LibChangelog">
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
+    </style>
+
+    <!-- DIALOG Theme -->
+
+    <style name="ChangeLogAlertDialogTheme" parent="LibChangelog">
+<!--        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>-->
+        <item name="buttonBarPositiveButtonStyle">@style/ChangeLogPositiveButtonStyle</item>
+
+    </style>
+
+<!--    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">-->
+<!--        <item name="android:textColor">#f00</item>-->
+<!--    </style>-->
+
+    <style name="ChangeLogPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?android:colorPrimary</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">?android:colorAccent</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
 </resources>
